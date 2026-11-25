@@ -39,6 +39,14 @@ def main() -> None:
     # user and must be able to read the file (tempfile.mkstemp forces
     # mode 0600, which breaks grading).
     os.chmod(path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
+    # Verify the write: read the file back and confirm it holds exactly
+    # the validated entry, so a silent or partial write cannot pass
+    # unnoticed.
+    with open(path, "r", encoding="utf-8") as f:
+        written = f.read()
+    validate(written)
+    assert written == ENTRY, "entry.txt differs from the validated entry"
+    print(f"wrote {len(ENTRY)} chars to {path}")
 
 
 if __name__ == "__main__":
